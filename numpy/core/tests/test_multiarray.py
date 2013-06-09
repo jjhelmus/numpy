@@ -974,11 +974,6 @@ class TestMethods(TestCase):
                 d[i:].partition(0, kind=k)
             assert_array_equal(d, tgt)
 
-            x = np.array([3, 4, 2, 1])
-            p = np.partition(x, (0, 3))
-            assert_equal(p[0], 1)
-            assert_equal(p[3], 4)
-
             d = np.array([2, 1])
             d.partition(0, kind=k)
             assert_raises(ValueError, d.partition, 2)
@@ -1063,6 +1058,84 @@ class TestMethods(TestCase):
                     dc = d1.copy()
                     dc.partition(i, axis=1, kind=k)
                     assert_equal(dc, np.partition(d1, i, axis=1, kind=k))
+
+
+    def assert_partitioned(self, d, kth):
+        prev = 0
+        for k in np.sort(kth):
+            assert_array_less(d[prev:k], d[k], err_msg='kth %d' % k)
+            assert_((d[k:] >= d[k]).all(),
+                    msg="kth %d, %r not greater equal %d" % (k, d[k:], d[k]))
+            prev = k + 1
+
+
+    def test_partition_iterative(self):
+            d = np.arange(17)
+            kth = (0, 1, 2, 429, 231)
+            assert_raises(ValueError, d.partition, kth)
+            assert_raises(ValueError, d.argpartition, kth)
+            d = np.arange(10).reshape((2, 5))
+            assert_raises(ValueError, d.partition, kth, axis=0)
+            assert_raises(ValueError, d.partition, kth, axis=1)
+            assert_raises(ValueError, np.partition, d, kth, axis=1)
+            assert_raises(ValueError, np.partition, d, kth, axis=None)
+
+            d = np.array([3, 4, 2, 1])
+            p = np.partition(d, (0, 3))
+            self.assert_partitioned(p, (0, 3))
+            self.assert_partitioned(d[np.argpartition(d, (0, 3))], (0, 3))
+
+            assert_array_equal(p, np.partition(d, (-3, -1)))
+            assert_array_equal(p, d[np.argpartition(d, (-3, -1))])
+
+            d = np.arange(17)
+            np.random.shuffle(d)
+            d.partition(range(d.size))
+            assert_array_equal(np.arange(17), d)
+            np.random.shuffle(d)
+            assert_array_equal(np.arange(17), d[d.argpartition(range(d.size))])
+
+            # test unsorted kth
+            d = np.arange(17)
+            np.random.shuffle(d)
+            keys = np.array([1, 3, 8, -2])
+            np.random.shuffle(d)
+            p = np.partition(d, keys)
+            self.assert_partitioned(p, keys)
+            p = d[np.argpartition(d, keys)]
+            self.assert_partitioned(p, keys)
+            np.random.shuffle(keys)
+            assert_array_equal(np.partition(d, keys), p)
+            assert_array_equal(d[np.argpartition(d, keys)], p)
+
+            # equal kth
+            d = np.arange(20)[::-1]
+            self.assert_partitioned(np.partition(d, [5]*4), [5])
+            self.assert_partitioned(np.partition(d, [5]*4 + [6, 13]),
+                                    [5]*4 + [6, 13])
+            self.assert_partitioned(d[np.argpartition(d, [5]*4)], [5])
+            self.assert_partitioned(d[np.argpartition(d, [5]*4 + [6, 13])],
+                                    [5]*4 + [6, 13])
+
+            d = np.arange(12)
+            np.random.shuffle(d)
+            d1 = np.tile(np.arange(12), (4, 1))
+            map(np.random.shuffle, d1)
+            d0 = np.transpose(d1)
+
+            kth = (1, 6, 7, -1)
+            p = np.partition(d1, kth, axis=1)
+            pa = d1[np.arange(d1.shape[0])[:,None],
+                    d1.argpartition(kth, axis=1)]
+            assert_array_equal(p, pa)
+            for i in range(d1.shape[0]):
+                self.assert_partitioned(p[i, :], kth)
+            p = np.partition(d0, kth, axis=0)
+            pa = d0[np.argpartition(d0, kth, axis=0),
+                    np.arange(d0.shape[1])[None,:]]
+            assert_array_equal(p, pa)
+            for i in range(d0.shape[1]):
+                self.assert_partitioned(p[:, i], kth)
 
 
     def test_partition_cdtype(self):
