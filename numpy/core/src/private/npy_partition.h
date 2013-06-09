@@ -524,7 +524,7 @@ static part_map _part_map[] = {
 };
 
 
-static NPY_NO_EXPORT PyArray_PartitionFunc *
+static NPY_INLINE PyArray_PartitionFunc *
 get_partition_func(int type, NPY_SELECTKIND which)
 {
     npy_intp i;
@@ -539,7 +539,7 @@ get_partition_func(int type, NPY_SELECTKIND which)
 }
 
 
-static NPY_NO_EXPORT PyArray_ArgPartitionFunc *
+static NPY_INLINE PyArray_ArgPartitionFunc *
 get_argpartition_func(int type, NPY_SELECTKIND which)
 {
     npy_intp i;
