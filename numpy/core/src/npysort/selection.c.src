@@ -74,6 +74,8 @@ median_of_median5_@suff@(@type@ *v, const npy_intp num,
         aunguarded_partition_@suff@(v, tosort, pivot, ll, hh)
 #define INTROSELECT(v, tosort, num, kth, pivots, npiv) \
         aintroselect_@suff@(v, tosort, nmed, nmed / 2, pivots, npiv, NULL)
+#define DUMBSELECT(v, tosort, left, num, kth) \
+        adumb_select_@suff@(v, tosort + left, num, kth)
 #else
 #define IDX(x) (x)
 #define SORTEE(x) v[x]
@@ -86,6 +88,8 @@ median_of_median5_@suff@(@type@ *v, const npy_intp num,
         unguarded_partition_@suff@(v, pivot, ll, hh)
 #define INTROSELECT(v, tosort, num, kth, pivots, npiv) \
         introselect_@suff@(v, nmed, nmed / 2, pivots, npiv, NULL)
+#define DUMBSELECT(v, tosort, left, num, kth) \
+        dumb_select_@suff@(v + left, num, kth)
 #endif
 
 
@@ -212,6 +216,36 @@ static npy_intp
 
 
 /*
+ * N^2 selection, fast only for very small kth
+ * useful for close multiple partitions
+ * (e.g. even element median, interpolating percentile)
+ */
+static int
+@name@dumb_select_@suff@(@type@ *v,
+#if @arg@
+                         npy_intp * tosort,
+#endif
+                         npy_intp num, npy_intp kth)
+{
+    npy_intp i;
+    for (i = 0; i <= kth; i++) {
+        npy_intp minidx = i;
+        @type@ minval = v[IDX(i)];
+        npy_intp k;
+        for (k = i + 1; k < num; k++) {
+            if (@TYPE@_LT(v[IDX(k)], minval)) {
+                minidx = k;
+                minval = v[IDX(k)];
+            }
+        }
+        SWAP(SORTEE(i), SORTEE(minidx));
+    }
+
+    return 0;
+}
+
+
+/*
  * iterative median of 3 quickselect with cutoff to median-of-medians-of5
  * receives stack of already computed pivots in v to minimize the
  * partition size were kth is searched in
@@ -256,6 +290,14 @@ int
 
         /* pop from stack */
         *npiv -= 1;
+    }
+
+    /*
+     * use a faster O(n*kth) algorithm for very small kth
+     * e.g. for interpolating percentile
+     */
+    if (kth - low < 3) {
+        return DUMBSELECT(v, tosort, low, high - low + 1, kth - low);
     }
 
     /* dumb integer msb, float npy_log2 too slow for small parititions */
@@ -311,7 +353,7 @@ int
         SWAP(SORTEE(low), SORTEE(hh));
 
         /* store the pivot */
-        if (pivots != NULL && hh > kth && *npiv < NPY_MAX_PIVOT_STACK) {
+        if (pivots != NULL && hh >= kth && *npiv < NPY_MAX_PIVOT_STACK) {
             pivots[*npiv] = hh;
             (*npiv) += 1;
         }
@@ -323,9 +365,15 @@ int
     }
 
     /* two elements */
-    if (high == low + 1)
+    if (high == low + 1) {
         if (@TYPE@_LT(v[IDX(high)], v[IDX(low)]))
             SWAP(SORTEE(high), SORTEE(low))
+        /* store the pivots */
+        if (pivots != NULL && low >= kth && *npiv < NPY_MAX_PIVOT_STACK) {
+            pivots[*npiv] = low;
+            (*npiv) += 1;
+        }
+    }
 
     return 0;
 }
@@ -338,6 +386,7 @@ int
 #undef MEDIAN5
 #undef UNGUARDED_PARTITION
 #undef INTROSELECT
+#undef DUMBSELECT
 /**end repeat1**/
 
 /**end repeat**/
