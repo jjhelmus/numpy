@@ -549,11 +549,13 @@ def partition(a, kth, axis=-1, kind='introselect', order=None):
     ----------
     a : array_like
         Array to be sorted.
-    kth : int
+    kth : int or sequence of ints
         Element index to partition by. The kth element will be in its final
         sorted position and all smaller elements will be moved before it and
         all larger elements behind it.
         The order all elements in the partitions is undefined.
+        If provided with a sequence of kth it will partition all of them into
+        their sorted position at once.
     axis : int or None, optional
         Axis along which to sort. If None, the array is flattened before
         sorting. The default is -1, which sorts along the last axis.
@@ -584,7 +586,7 @@ def partition(a, kth, axis=-1, kind='introselect', order=None):
     ================= ======= ============= ============ =======
        kind            speed   worst case    work space  stable
     ================= ======= ============= ============ =======
-    'introselect'        1       O(n)            0          no
+    'introselect'        1        O(n)           0         no
     ================= ======= ============= ============ =======
 
     All the partition algorithms make temporary copies of the data when
@@ -600,8 +602,11 @@ def partition(a, kth, axis=-1, kind='introselect', order=None):
     Examples
     --------
     >>> a = np.array([3, 4, 2, 1])
-    >>> a.partition(2)
+    >>> np.partition(a, 3)
     array([2, 1, 3, 4])
+
+    >>> np.partition(a, (1, 3))
+    array([1, 2, 3, 4])
 
     """
     if axis is None:
@@ -624,11 +629,13 @@ def argpartition(a, kth, axis=-1, kind='introselect', order=None):
     ----------
     a : array_like
         Array to sort.
-    kth : int
+    kth : int or sequence of ints
         Element index to partition by. The kth element will be in its final
         sorted position and all smaller elements will be moved before it and
         all larger elements behind it.
         The order all elements in the partitions is undefined.
+        If provided with a sequence of kth it will partition all of them into
+        their sorted position at once.
     axis : int or None, optional
         Axis along which to sort.  The default is -1 (the last axis). If None,
         the flattened array is used.
@@ -652,15 +659,17 @@ def argpartition(a, kth, axis=-1, kind='introselect', order=None):
 
     Notes
     -----
-    See `partition` for notes on the different sorting algorithms.
+    See `partition` for notes on the different selection algorithms.
 
     Examples
     --------
     One dimensional array:
 
     >>> x = np.array([3, 4, 2, 1])
-    >>> np.argpartition(x)
-    array([2, 3, 0, 1])
+    >>> x[np.argpartition(x, 3)]
+    array([2, 1, 3, 4])
+    >>> x[np.argpartition(x, (1, 3))]
+    array([1, 2, 3, 4])
 
     """
     return a.argpartition(kth, axis, kind=kind, order=order)

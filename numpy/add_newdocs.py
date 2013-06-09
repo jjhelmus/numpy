@@ -4228,11 +4228,13 @@ add_newdoc('numpy.core.multiarray', 'ndarray', ('partition',
 
     Parameters
     ----------
-    kth : int
+    kth : int or sequence of ints
         Element index to partition by. The kth element will be in its final
         sorted position and all smaller elements will be moved before it and
         all larger elements behind it.
         The order all elements in the partitions is undefined.
+        If provided with a sequence of kth it will partition all of them into
+        their sorted position at once.
     axis : int, optional
         Axis along which to sort. Default is -1, which means sort along the
         last axis.
@@ -4255,10 +4257,12 @@ add_newdoc('numpy.core.multiarray', 'ndarray', ('partition',
     Examples
     --------
     >>> a = np.array([3, 4, 2, 1])
-    >>> a.partition(2)
+    >>> a.partition(a, 3)
     >>> a
     array([2, 1, 3, 4])
 
+    >>> a.partition((1, 3))
+    array([1, 2, 3, 4])
     """))
 
 
