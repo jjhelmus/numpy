@@ -974,6 +974,11 @@ class TestMethods(TestCase):
                 d[i:].partition(0, kind=k)
             assert_array_equal(d, tgt)
 
+            x = np.array([3, 4, 2, 1])
+            p = np.partition(x, (0, 3))
+            assert_equal(p[0], 1)
+            assert_equal(p[3], 4)
+
             d = np.array([2, 1])
             d.partition(0, kind=k)
             assert_raises(ValueError, d.partition, 2)
