@@ -1060,6 +1060,32 @@ class TestMethods(TestCase):
                     assert_equal(dc, np.partition(d1, i, axis=1, kind=k))
 
 
+    def test_partition_cdtype(self):
+        d = array([('Galahad', 1.7, 38), ('Arthur', 1.8, 41),
+                   ('Lancelot', 1.9, 38)],
+                  dtype=[('name', '|S10'), ('height', '<f8'), ('age', '<i4')])
+
+        tgt = np.sort(d, order=['age', 'height'])
+        assert_array_equal(np.partition(d, range(d.size),
+                                        order=['age', 'height']),
+                           tgt)
+        assert_array_equal(d[np.argpartition(d, range(d.size),
+                                             order=['age', 'height'])],
+                           tgt)
+        for k in range(d.size):
+            assert_equal(np.partition(d, k, order=['age', 'height'])[k],
+                        tgt[k])
+            assert_equal(d[np.argpartition(d, k, order=['age', 'height'])][k],
+                         tgt[k])
+
+        d = array(['Galahad', 'Arthur', 'zebra', 'Lancelot'])
+        tgt = np.sort(d)
+        assert_array_equal(np.partition(d, range(d.size)), tgt)
+        for k in range(d.size):
+            assert_equal(np.partition(d, k)[k], tgt[k])
+            assert_equal(d[np.argpartition(d, k)][k], tgt[k])
+
+
     def test_flatten(self):
         x0 = np.array([[1,2,3],[4,5,6]], np.int32)
         x1 = np.array([[[1,2],[3,4]],[[5,6],[7,8]]], np.int32)

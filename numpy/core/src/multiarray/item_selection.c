@@ -1270,10 +1270,10 @@ PyArray_Partition(PyArrayObject *op, PyArrayObject * ktharray, int axis, NPY_SEL
         return -1;
     }
 
-    /* FIXME */
+    /* select not implemented, use quicksort, slower but equivalent */
     switch (which) {
         case NPY_INTROSELECT :
-            sort = npy_introselect;
+            sort = npy_quicksort;
             break;
         default:
             PyErr_SetString(PyExc_TypeError,
@@ -1300,6 +1300,7 @@ PyArray_Partition(PyArrayObject *op, PyArrayObject * ktharray, int axis, NPY_SEL
     /* Store global -- allows re-entry -- restore before leaving*/
     store_arr = global_obj;
     global_obj = ap;
+    /* we don't need to care about kth here as we are using a full sort */
     for (ip = PyArray_DATA(ap), i = 0; i < n; i++, ip += elsize*m) {
         res = sort(ip, m, elsize, sortCompare);
         if (res < 0) {
@@ -1551,9 +1552,10 @@ PyArray_ArgPartition(PyArrayObject *op, PyArrayObject * ktharray, int axis, NPY_
         goto fail;
     }
 
+    /* select not implemented, use quicksort, slower but equivalent */
     switch (which) {
         case NPY_INTROSELECT :
-            sort = npy_introselect;
+            sort = npy_quicksort;
             break;
         default:
             PyErr_SetString(PyExc_TypeError,
@@ -1589,6 +1591,7 @@ PyArray_ArgPartition(PyArrayObject *op, PyArrayObject * ktharray, int axis, NPY_
     global_data = PyArray_DATA(op);
     store = global_obj;
     global_obj = op;
+    /* we don't need to care about kth here as we are using a full sort */
     for (i = 0; i < n; i++, ip += m, global_data += m*argsort_elsize) {
         for (j = 0; j < m; j++) {
             ip[j] = j;

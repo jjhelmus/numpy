@@ -572,7 +572,7 @@ def partition(a, kth, axis=-1, kind='introselect', order=None):
     See Also
     --------
     ndarray.partition : Method to sort an array in-place.
-    argpartition : Indirect sort.
+    argpartition : Indirect partition.
 
     Notes
     -----
@@ -613,7 +613,7 @@ def partition(a, kth, axis=-1, kind='introselect', order=None):
     return a
 
 
-def argpartition(a, kth, axis=-1, kind='instroselect', order=None):
+def argpartition(a, kth, axis=-1, kind='introselect', order=None):
     """
     Perform an indirect partition along the given axis using the algorithm
     specified by the `kind` keyword. It returns an array of indices of the
