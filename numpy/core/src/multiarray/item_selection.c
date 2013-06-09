@@ -1181,12 +1181,6 @@ partition_prep_kth_array(PyArrayObject * ktharray,
     if (kthrvl == NULL)
         return NULL;
 
-    /*
-     * sort the array of kths so the partitions will
-     * not trample on each other
-     */
-    PyArray_Sort(kthrvl, -1, NPY_QUICKSORT);
-
     kth = PyArray_DATA(kthrvl);
     nkth = PyArray_SIZE(kthrvl);
 
@@ -1201,6 +1195,12 @@ partition_prep_kth_array(PyArrayObject * ktharray,
             return NULL;
         }
     }
+
+    /*
+     * sort the array of kths so the partitions will
+     * not trample on each other
+     */
+    PyArray_Sort(kthrvl, -1, NPY_QUICKSORT);
 
     return kthrvl;
 }
