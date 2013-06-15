@@ -3005,29 +3005,14 @@ def median(a, axis=None, out=None, overwrite_input=False):
             sz = part.size
             if sz % 2 == 0:
                 szh = sz // 2
-                part.partition(szh - 1)
-                # get minimum of remaining partition, faster than
-                # part[szh:].partition(0)
-                m = part[szh:].argmin() + szh
-                part[m], part[szh] = part[szh], part[m]
+                part.partition((szh - 1, szh))
             else:
                 part.partition((sz - 1) // 2)
         else:
             sz = a.shape[axis]
             if sz % 2 == 0:
                 szh = sz // 2
-                a.partition(szh - 1, axis=axis)
-                idx = [slice(None)] * a.ndim
-                idx[axis] = slice(szh, sz)
-                # get minimum of remaining partition, faster than
-                # a[idx].partition(0, axis=axis)
-                m = a[idx].argmin(axis=axis) + szh
-                idx = [np.arange(x)[:, np.newaxis] for x in a.shape[:axis]]
-                idx += [m]
-                idx += [np.arange(x) for x in a.shape[axis + 1:]]
-                idx2 = idx[:]
-                idx2[axis] = np.zeros_like(m) + szh
-                a[idx], a[idx2] = a[idx2], a[idx]
+                a.partition((szh - 1, szh), axis=axis)
             else:
                 a.partition((sz - 1)// 2, axis=axis)
             part = a
@@ -3037,22 +3022,7 @@ def median(a, axis=None, out=None, overwrite_input=False):
         else:
             sz = a.shape[axis]
         if sz % 2 == 0:
-            part = partition(a, (sz // 2) - 1, axis=axis)
-            indexer = [slice(None)] * part.ndim
-            if axis is None:
-                axis = 0
-            indexer[axis] = slice(sz // 2, sz)
-            # get minimum of remaining partition, faster than
-            # part[indexer].partition(0, axis=axis)
-            m = part[indexer].min(axis=axis)
-            # extend minimum axis
-            if not np.isscalar(m):
-                indexer2 = indexer[:]
-                indexer2[axis] = np.newaxis
-                m = m[indexer2]
-            indexer[axis] = slice(sz // 2, sz // 2 + 1)
-            # working on copy -> we can overwrite first entry with copy
-            part[indexer] = m
+            part = partition(a, ((sz // 2) - 1, sz // 2), axis=axis)
         else:
             part = partition(a, (sz - 1) // 2, axis=axis)
     if part.shape == ():
