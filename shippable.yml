@@ -14,7 +14,7 @@ build:
     - python -V
     - pip --version
     - pip install -v pytest cython
-    - python setup.py build_ext -i -j 32
+    - python setup.py build_ext -i
     - python -c "import numpy; print(numpy.__version__)"
     - pytest -v .
 
