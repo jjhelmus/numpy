@@ -1,0 +1,33 @@
+language: python
+
+runtime:
+  nodePool: shippable_shared_aarch64
+
+branches:
+  only:
+    - master
+
+python: 
+  - 2.7
+
+
+build:
+  # http://docs.shippable.com/ci/shippableyml/#ci
+  ci:
+    - cat /proc/cpuinfo
+    - lscpu
+    - python -V
+    - pip --version
+    - pip install pytest
+    - python setup.py build_ext -i -j
+    - python -c "import numpy; print(numpy.__version__)"
+    - pytest -v .
+
+integrations:
+
+  notifications:
+    - integrationName: email
+      type: email
+      on_success: change
+      on_failure: always
+      on_pull_request: never
