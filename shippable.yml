@@ -3,10 +3,6 @@ language: python
 runtime:
   nodePool: shippable_shared_aarch64
 
-branches:
-  only:
-    - master
-
 python: 
   - 2.7
 
