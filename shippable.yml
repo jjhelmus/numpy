@@ -13,8 +13,8 @@ build:
     - lscpu
     - python -V
     - pip --version
-    - pip install pytest cython
-    - python setup.py build_ext -i -j
+    - pip install -v pytest cython
+    - python setup.py build_ext -i -j 32
     - python -c "import numpy; print(numpy.__version__)"
     - pytest -v .
 
