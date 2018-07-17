@@ -16,7 +16,8 @@ build:
     - pip install --upgrade pip
     - pip --version
     - pip install -v pytest
-    - pip install -v Cython --install-option="--no-cython-compile"
+    - pip install -i https://pypi.anaconda.org/jjhelmus/simple cython
+    #- pip install -v Cython --install-option="--no-cython-compile"
     - python setup.py build_ext -i
     - python -c "import numpy; print(numpy.__version__)"
     - pytest -v .
