@@ -16,4 +16,4 @@ build:
     - pip install -i https://pypi.anaconda.org/jjhelmus/simple cython
     - pip install nose pytz pytest
     - pip install -v .
-    - mkdir -p empty; cd empty; python ../tools/test-installed-numpy.py -v  --with-xunit --xunit-file=shippable/testresults/nosetest.xml
+    - mkdir -p empty; cd empty; python ../tools/test-installed-numpy.py -v  --with-xunit --xunit-file=../shippable/testresults/nosetest.xml
