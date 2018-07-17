@@ -6,27 +6,12 @@ runtime:
 python: 
   - 2.7
 
-
 build:
-  # http://docs.shippable.com/ci/shippableyml/#ci
   ci:
     - lscpu
     - python -V
-    - pip --version
-    - pip install --upgrade pip
-    - pip --version
-    - pip install -v pytest
-    - pip install -i https://pypi.anaconda.org/jjhelmus/simple cython
-    #- pip install -v Cython --install-option="--no-cython-compile"
-    - python setup.py build_ext -i
-    - python -c "import numpy; print(numpy.__version__)"
-    - pytest -v .
-
-integrations:
-
-  notifications:
-    - integrationName: email
-      type: email
-      on_success: change
-      on_failure: always
-      on_pull_request: never
+    - pip install --upgrade pip setuptools
+    - pip install Cython --install-option="--no-cython-compile"
+    - pip install nose pytz pytest
+    - python setup.py build_ext -i -j 4
+    - mkdir -p empty; cd empty; python ../tools/test-installed-numpy.py -v --mode=full
