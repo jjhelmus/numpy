@@ -11,6 +11,7 @@ python:
 
 build:
   ci:
+    - apt install -y ${SHIPPABLE_PYTHON_VERSION}-dev
     - lscpu
     - python -V
     - pip install --upgrade pip setuptools
