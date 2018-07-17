@@ -4,7 +4,7 @@ runtime:
   nodePool: shippable_shared_aarch64
 
 python: 
-  - 3.5
+  - 2.7
 
 build:
   ci:
@@ -14,5 +14,5 @@ build:
     #- pip install Cython --install-option="--no-cython-compile"
     - pip install -i https://pypi.anaconda.org/jjhelmus/simple cython
     - pip install nose pytz pytest
-    - python setup.py build_ext -i -j 4
+    - pip install -v .
     - mkdir -p empty; cd empty; python ../tools/test-installed-numpy.py -v --mode=full
