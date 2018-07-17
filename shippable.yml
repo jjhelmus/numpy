@@ -13,7 +13,10 @@ build:
     - lscpu
     - python -V
     - pip --version
-    - pip install -v pytest cython
+    - pip install --upgrade pip
+    - pip --version
+    - pip install -v pytest
+    - pip install -v Cython --install-option="--no-cython-compiler"
     - python setup.py build_ext -i
     - python -c "import numpy; print(numpy.__version__)"
     - pytest -v .
