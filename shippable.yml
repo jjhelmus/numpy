@@ -5,6 +5,7 @@ runtime:
 
 python: 
   - 2.7
+  - 3.6
 
 build:
   ci:
@@ -15,4 +16,4 @@ build:
     - pip install -i https://pypi.anaconda.org/jjhelmus/simple cython
     - pip install nose pytz pytest
     - pip install -v .
-    - mkdir -p empty; cd empty; python ../tools/test-installed-numpy.py -v --mode=full
+    - mkdir -p empty; cd empty; python ../tools/test-installed-numpy.py -v
