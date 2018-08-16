@@ -1,0 +1,19 @@
+language: python
+
+runtime:
+  nodePool: shippable_shared_aarch64
+
+python: 
+  - 2.7
+  - 3.6
+
+build:
+  ci:
+    - lscpu
+    - python -V
+    - pip install --upgrade pip setuptools
+    #- pip install Cython --install-option="--no-cython-compile"
+    - pip install -i https://pypi.anaconda.org/jjhelmus/simple cython
+    - pip install nose pytz pytest
+    - pip install -v .
+    - mkdir -p empty; cd empty; python ../tools/test-installed-numpy.py -v  -- --junit-xml=../shippable/testresults/tests.xml
